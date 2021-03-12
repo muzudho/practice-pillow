@@ -17,6 +17,27 @@ def main():
     # 0時の方向から時計回り
     theta_list = [90, 75, 60, 45, 30, 15, 0, 345,
                   330, 315, 300, 285, 270, 255, 240, 225, 210, 195, 180, 165, 150, 135, 120, 105]
+    size = len(theta_list)
+
+    # ３本の波を描きます
+    circumference = 360  # 半径１の円の一周の長さ
+    arc = circumference/size  # 等分割した１つの弧
+    print(f"arc={arc} circumference={circumference}")
+    for i in range(0, size):
+        theta = i * arc
+        # thetaが0のときyが1なのはcos波
+        ry = math.cos(math.radians(theta))
+        # -1～1 を 0～255 にマッピングします
+        rvalue = range1_to_byte(ry)
+        print(f"[{i}] red {rvalue} y={ry} theta={theta}")
+
+        gy = math.cos(math.radians(theta-60))
+        gvalue = range1_to_byte(gy)
+
+        by = math.cos(math.radians(theta-120))
+        bvalue = range1_to_byte(by)
+        print(f"[{i}] {rvalue:02x} {gvalue:02x} {bvalue:02x}")
+
     # 0時を赤
     color_list = [(0xff, 0x66, 0x99), (0xff, 0x77, 0x77),
                   (0xff, 0x99, 0x66), (0xff, 0xaa, 0x55),
@@ -226,8 +247,15 @@ def paint_one_color_gauge(src_left, src_top, w, h, value, fill_color):
     pass
 
 
+def range1_to_byte(range1):
+    """-1～1 を 0～255 にマッピングします
+    """
+
+    return int((range1+1)*(255/2))
+
+
 def byte_to_half_byte(value):
-    """0～255を、0～15に縮めます
+    """0～255を、0～15にマッピングします
     """
     return int(value/16)
 
