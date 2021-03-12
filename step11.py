@@ -18,39 +18,51 @@ def main():
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = create_color_list(size, range1_to_byte_normal)
+    color_list = create_cos_wave(size)
+    color_list = filtering_color_list(color_list, bright_fileter)
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/bright-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = create_color_list(size, range1_to_byte_deep_tone)
+    color_list = create_cos_wave(size)
+    color_list = filtering_color_list(color_list, deep_filter)
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/deep-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = create_color_list(size, range1_to_byte_dark_tone)
+    color_list = create_cos_wave(size)
+    color_list = filtering_color_list(color_list, dark_filter)
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/dark-tone.png')
 
 
-def range1_to_byte_normal(range1):
-    """-1～1 を 0～255 にマッピングします"""
-    return int((range1+1)*(255/2))
+def bright_fileter(color):
+    def element(num):
+        """-1～1 を 0～255 にマッピングします"""
+        return int((num+1)*(255/2))
+
+    return (element(color[0]), element(color[1]), element(color[2]))
 
 
-def range1_to_byte_deep_tone(range1):
-    """-1～1 を 0～170 にマッピングします"""
-    return int((range1+1)*(255*(2/3)/2))
+def deep_filter(color):
+    def element(num):
+        """-1～1 を 0～170 にマッピングします"""
+        return int((num+1)*(255*(2/3)/2))
+
+    return (element(color[0]), element(color[1]), element(color[2]))
 
 
-def range1_to_byte_dark_tone(range1):
-    """-1～1 を 0～113 にマッピングします"""
-    return int((range1+1)*(255*(4/9)/2))
+def dark_filter(color):
+    def element(num):
+        """-1～1 を 0～113 にマッピングします"""
+        return int((num+1)*(255*(4/9)/2))
+
+    return (element(color[0]), element(color[1]), element(color[2]))
 
 
-def create_color_list(size, range1_to_byte):
+def filtering_color_list(old_color_list, color_filter):
     """
     # Example: 0時を赤
     color_list = [(0xff, 0x66, 0x99), (0xff, 0x77, 0x77),
@@ -67,26 +79,14 @@ def create_color_list(size, range1_to_byte):
                   (0xff, 0x33, 0xcc), (0xff, 0x44, 0xbb)]
     """
 
-    old_color_list = create_cos_wave(size)
     color_list = []
 
-    # ３本の波を描きます
-    circumference = 360  # 半径１の円の一周の長さ
-    arc = circumference/size  # 等分割した１つの弧
-    print(f"arc={arc} circumference={circumference}")
+    # ３本の波にフィルターを掛けます
+    size = len(old_color_list)
     for i in range(0, size):
-        ry = old_color_list[i][0]
-        # -1～1 を 0～255 にマッピングします
-        rvalue = range1_to_byte(ry)
-        # print(f"[{i}] red {rvalue} y={ry} theta={theta}")
-
-        gy = old_color_list[i][1]
-        gvalue = range1_to_byte(gy)
-
-        by = old_color_list[i][2]
-        bvalue = range1_to_byte(by)
-        print(f"[{i}] {rvalue:02x} {gvalue:02x} {bvalue:02x}")
-        color_list.append((rvalue, gvalue, bvalue))
+        new_color = color_filter(old_color_list[i])
+        # print(f"[{i}] {new_color[0]:02x} {new_color[1]:02x} {new_color[2]:02x}")
+        color_list.append(new_color)
 
     return color_list
 
