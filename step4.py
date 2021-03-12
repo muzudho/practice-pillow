@@ -22,8 +22,24 @@ def main():
 
     for p in gauge_center_coords:
         x, y = coord_on_gauge(p)
+
+        # ゲージ3+隙間1 の 4 なんでゲージは左にずれているから中心を調整する
+        x -= 1
+
         point_w = 4
-        draw.ellipse((x-point_w/2, y-point_w/2, x+point_w, y+point_w), fill=black,
+
+        horizontal_interval = 13
+
+        # 赤ゲージ
+        draw.ellipse((x-point_w/2-horizontal_interval, y-point_w/2, x+point_w-horizontal_interval, y+point_w), fill=red,
+                     outline=(155, 155, 155))
+
+        # 緑ゲージ
+        draw.ellipse((x-point_w/2, y-point_w/2, x+point_w, y+point_w), fill=green,
+                     outline=(155, 155, 155))
+
+        # 青ゲージ
+        draw.ellipse((x-point_w/2+horizontal_interval, y-point_w/2, x+point_w+horizontal_interval, y+point_w), fill=blue,
                      outline=(155, 155, 155))
 
     im.save('shared/pillow_imagedraw.png', quality=95)
@@ -96,11 +112,13 @@ def paint_one_color_gauge(src_left, src_top, w, h, value, fill_color):
         0...255
     """
 
+    half_byte = byte_to_half_byte(value)
+
     y = src_top
     for i in range(0, 16):
         x = src_left
 
-        if value < (16-i)*16:
+        if half_byte < (16-i):
             fc = light_gray
         else:
             fc = fill_color
@@ -110,6 +128,12 @@ def paint_one_color_gauge(src_left, src_top, w, h, value, fill_color):
         # 2px は開けないと、くっついている。 +1 だと隣なので
         y += h+2
     pass
+
+
+def byte_to_half_byte(value):
+    """0～255を、0～15に縮めます
+    """
+    return int(value/16)
 
 
 main()
