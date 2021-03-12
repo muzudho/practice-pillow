@@ -5,6 +5,7 @@ black = (0, 0, 0)
 red = (0xff, 0x33, 0x66)
 green = (0x66, 0xff, 0x33)
 blue = (0x33, 0x66, 0xff)
+light_gray = (0xee, 0xee, 0xee)
 white = (255, 255, 255)
 
 im = Image.new('RGB', (450, 450), white)
@@ -22,7 +23,7 @@ def paint_gauge_ring(left, top, range, theta_list):
     for theta in theta_list:
         x = range*math.cos(math.radians(theta))
         y = range*math.sin(math.radians(theta))
-        paint_gauge(x+left, y+top, 0x00, 0x09, 0xff)
+        paint_gauge(x+left, y+top, 0x00, 0x99, 0xff)
 
 
 def paint_gauge(src_center_x, src_center_y, r, g, b):
@@ -43,17 +44,17 @@ def paint_gauge(src_center_x, src_center_y, r, g, b):
     src_y = src_center_y - gauge_h/2
 
     # ゲージの面積をだいたい視覚化
-    draw.rectangle((src_x, src_y, gauge_w+src_x,
-                    gauge_h+src_y), outline=black)
+    # draw.rectangle((src_x, src_y, gauge_w+src_x,
+    #                gauge_h+src_y), outline=black)
 
     # 赤ゲージ
-    paint_one_color_gauge(src_x, src_y, w, h, red)
+    paint_one_color_gauge(src_x, src_y, w, h, r, red)
 
     # 青ゲージ
-    paint_one_color_gauge(src_x+w+2, src_y, w, h, green)
+    paint_one_color_gauge(src_x+w+2, src_y, w, h, g, green)
 
     # 緑ゲージ
-    paint_one_color_gauge(src_x+2*(w+2), src_y, w, h, blue)
+    paint_one_color_gauge(src_x+2*(w+2), src_y, w, h, b, blue)
 
     y = gauge_h+src_y-font_height
     x = src_x
@@ -66,13 +67,24 @@ def paint_gauge(src_center_x, src_center_y, r, g, b):
     im.save('shared/pillow_imagedraw.png', quality=95)
 
 
-def paint_one_color_gauge(src_left, src_top, w, h, fill_color):
-    """一色ゲージ"""
+def paint_one_color_gauge(src_left, src_top, w, h, value, fill_color):
+    """一色ゲージ
+    Parameters
+    ----------
+    value : int
+        0...255
+    """
 
     y = src_top
-    for _ in range(0, 16):
+    for i in range(0, 16):
         x = src_left
-        draw.rectangle((x, y, x+w, y+h), fill=fill_color, outline=None)
+
+        if value < (16-i)*16:
+            fc = light_gray
+        else:
+            fc = fill_color
+
+        draw.rectangle((x, y, x+w, y+h), fill=fc, outline=None)
 
         # 2px は開けないと、くっついている。 +1 だと隣なので
         y += h+2
