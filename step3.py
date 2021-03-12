@@ -31,9 +31,12 @@ def paint_gauge(src_center_x, src_center_y, r, g, b):
     w = 10
     h = 0
 
+    # フォントのだいたいの高さ
+    font_height = 8
+
     # ゲージの矩形面積をだいたい計算
     gauge_w = 3*(w+2)-2
-    gauge_h = 16*(h+2)+6
+    gauge_h = 16*(h+2)+font_height-2
 
     # 中心座標を 左上起点座標に変更
     src_x = src_center_x - gauge_w/2
@@ -43,19 +46,16 @@ def paint_gauge(src_center_x, src_center_y, r, g, b):
     draw.rectangle((src_x, src_y, gauge_w+src_x,
                     gauge_h+src_y), outline=black)
 
-    y = src_y
-    for _ in range(0, 16):
-        x = src_x
-        draw.rectangle((x, y, x+w, y+h), fill=red, outline=None)
-        x += w+2
-        draw.rectangle((x, y, x+w, y+h), fill=green, outline=None)
-        x += w+2
-        draw.rectangle((x, y, x+w, y+h), fill=blue, outline=None)
+    # 赤ゲージ
+    paint_one_color_gauge(src_x, src_y, w, h, red)
 
-        # 2px は開けないと、くっついている。 +1 だと隣なので
-        y += h+2
+    # 青ゲージ
+    paint_one_color_gauge(src_x+w+2, src_y, w, h, green)
 
-    y -= h+3
+    # 緑ゲージ
+    paint_one_color_gauge(src_x+2*(w+2), src_y, w, h, blue)
+
+    y = gauge_h+src_y-font_height
     x = src_x
     draw.text((x, y), f"{r:02x}", red)
     x += w+2
@@ -64,6 +64,18 @@ def paint_gauge(src_center_x, src_center_y, r, g, b):
     draw.text((x, y), f"{b:02x}", blue)
 
     im.save('shared/pillow_imagedraw.png', quality=95)
+
+
+def paint_one_color_gauge(src_left, src_top, w, h, fill_color):
+    """一色ゲージ"""
+
+    y = src_top
+    for _ in range(0, 16):
+        x = src_left
+        draw.rectangle((x, y, x+w, y+h), fill=fill_color, outline=None)
+
+        # 2px は開けないと、くっついている。 +1 だと隣なので
+        y += h+2
     pass
 
 
