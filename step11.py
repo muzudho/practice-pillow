@@ -40,26 +40,46 @@ def main():
 
 def bright_fileter(color):
     def element(num):
-        """-1～1 を 0～255 にマッピングします"""
-        return int((num+1)*(255/2))
+        """-1～1 を 0～255 辺りにマッピングします"""
+        return (num+1)*(255/2)
 
-    return (element(color[0]), element(color[1]), element(color[2]))
+    return int_filter(fit_filter((element(color[0]), element(color[1]), element(color[2]))))
 
 
 def deep_filter(color):
     def element(num):
-        """-1～1 を 0～170 にマッピングします"""
-        return int((num+1)*(255*(2/3)/2))
+        """-1～1 を 0～170 辺りにマッピングします"""
+        return (num+1)*(255*(2/3)/2)
 
-    return (element(color[0]), element(color[1]), element(color[2]))
+    return int_filter(fit_filter((element(color[0]), element(color[1]), element(color[2]))))
 
 
 def dark_filter(color):
     def element(num):
-        """-1～1 を 0～113 にマッピングします"""
-        return int((num+1)*(255*(4/9)/2))
+        """-1～1 を 0～113 辺りにマッピングします"""
+        return (num+1)*(255*(4/9)/2)
 
-    return (element(color[0]), element(color[1]), element(color[2]))
+    return int_filter(fit_filter((element(color[0]), element(color[1]), element(color[2]))))
+
+
+def fit_filter(color):
+    """255の値ができるように全体を調整"""
+
+    """
+    # フィットさせると 元の値に戻ってしまう
+    max_value = max(color[0], color[1], color[2])
+    rate = max_value/255
+    new_color = (color[0]/rate, color[1]/rate, color[2]/rate)
+    print(
+        f"r={color[0]} g={color[1]} b={color[2]} max_value={max_value} rate={rate} r={new_color[0]} g={new_color[1]} b={new_color[2]}")
+    return new_color
+    """
+
+    return color
+
+
+def int_filter(color):
+    return(int(color[0]), int(color[1]), int(color[2]))
 
 
 def filtering_color_list(old_color_list, color_filter):
