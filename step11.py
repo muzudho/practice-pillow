@@ -67,9 +67,36 @@ def create_color_list(size, range1_to_byte):
                   (0xff, 0x33, 0xcc), (0xff, 0x44, 0xbb)]
     """
 
+    old_color_list = create_cos_wave(size)
     color_list = []
 
     # ３本の波を描きます
+    circumference = 360  # 半径１の円の一周の長さ
+    arc = circumference/size  # 等分割した１つの弧
+    print(f"arc={arc} circumference={circumference}")
+    for i in range(0, size):
+        ry = old_color_list[i][0]
+        # -1～1 を 0～255 にマッピングします
+        rvalue = range1_to_byte(ry)
+        # print(f"[{i}] red {rvalue} y={ry} theta={theta}")
+
+        gy = old_color_list[i][1]
+        gvalue = range1_to_byte(gy)
+
+        by = old_color_list[i][2]
+        bvalue = range1_to_byte(by)
+        print(f"[{i}] {rvalue:02x} {gvalue:02x} {bvalue:02x}")
+        color_list.append((rvalue, gvalue, bvalue))
+
+    return color_list
+
+
+def create_cos_wave(size):
+    """３本の波を描きます。各値は -1～1 です
+    """
+
+    color_list = []
+
     circumference = 360  # 半径１の円の一周の長さ
     arc = circumference/size  # 等分割した１つの弧
     print(f"arc={arc} circumference={circumference}")
@@ -79,17 +106,13 @@ def create_color_list(size, range1_to_byte):
         # 赤を時計の０時方向に合わせたいので目視で 30° 時計回りに進めるという調整
         red_modify = -30
         ry = math.cos(math.radians(theta+red_modify))
-        # -1～1 を 0～255 にマッピングします
-        rvalue = range1_to_byte(ry)
-        # print(f"[{i}] red {rvalue} y={ry} theta={theta}")
+        # print(f"[{i}] red y={ry} theta={theta}")
 
         gy = math.cos(math.radians(theta+red_modify-60))
-        gvalue = range1_to_byte(gy)
 
         by = math.cos(math.radians(theta+red_modify+120))
-        bvalue = range1_to_byte(by)
-        print(f"[{i}] {rvalue:02x} {gvalue:02x} {bvalue:02x}")
-        color_list.append((rvalue, gvalue, bvalue))
+        print(f"[{i}] {ry} {gy} {by}")
+        color_list.append((ry, gy, by))
 
     return color_list
 
