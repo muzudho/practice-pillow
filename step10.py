@@ -8,9 +8,6 @@ blue = (0x33, 0x66, 0xff)
 light_gray = (0xee, 0xee, 0xee)
 white = (255, 255, 255)
 
-im = Image.new('RGB', (450, 450), white)
-draw = ImageDraw.Draw(im)
-
 
 def main():
 
@@ -19,12 +16,30 @@ def main():
                   330, 315, 300, 285, 270, 255, 240, 225, 210, 195, 180, 165, 150, 135, 120, 105]
     size = len(theta_list)
 
-    color_list = create_color_list(size)
+    im = Image.new('RGB', (450, 450), white)
+    draw = ImageDraw.Draw(im)
+    color_list = create_color_list(size, range1_to_byte_normal)
+    draw_tone_circle(draw, theta_list, color_list)
+    im.save('shared/bright-tone.png')
 
-    draw_image(theta_list, color_list, 'shared/pillow_imagedraw.png')
+    im = Image.new('RGB', (450, 450), white)
+    draw = ImageDraw.Draw(im)
+    color_list = create_color_list(size, range1_to_byte_deep_tone)
+    draw_tone_circle(draw, theta_list, color_list)
+    im.save('shared/deep-tone.png')
 
 
-def create_color_list(size):
+def range1_to_byte_normal(range1):
+    """-1～1 を 0～255 にマッピングします"""
+    return int((range1+1)*(255/2))
+
+
+def range1_to_byte_deep_tone(range1):
+    """-1～1 を 0～160 にマッピングします"""
+    return int((range1+1)*(160/2))
+
+
+def create_color_list(size, range1_to_byte):
     """
     # Example: 0時を赤
     color_list = [(0xff, 0x66, 0x99), (0xff, 0x77, 0x77),
@@ -66,10 +81,10 @@ def create_color_list(size):
     return color_list
 
 
-def draw_image(theta_list, color_list, file_name):
+def draw_tone_circle(draw, theta_list, color_list):
     # 環状 ゲージ 描画
     gauge_center_coords = center_coords_on_ring(225, 225, 190, theta_list)
-    paint_gauge_ring(gauge_center_coords, color_list)
+    draw_gauge_ring(draw, gauge_center_coords, color_list)
 
     # 環状 色セル 描画
     color_cell_center_coords = center_coords_on_ring(225, 225, 120, theta_list)
@@ -139,19 +154,16 @@ def draw_image(theta_list, color_list, file_name):
                      outline=(155, 155, 155))
 
     # 赤レーザー
-    draw_beams(three_gauges_top_coords, 0, red)
+    draw_beams(draw, three_gauges_top_coords, 0, red)
 
     # 緑レーザー
-    draw_beams(three_gauges_top_coords, 1, green)
+    draw_beams(draw, three_gauges_top_coords, 1, green)
 
     # 青レーザー
-    draw_beams(three_gauges_top_coords, 2, blue)
-
-    # im.save(file_name, quality=95)
-    im.save(file_name)
+    draw_beams(draw, three_gauges_top_coords, 2, blue)
 
 
-def draw_beams(three_gauges_top_coords, rgb_index, color):
+def draw_beams(draw, three_gauges_top_coords, rgb_index, color):
     half_size = int(len(three_gauges_top_coords)/2)
     for i in range(0, half_size):
         top_coords1 = three_gauges_top_coords[i]
@@ -161,7 +173,7 @@ def draw_beams(three_gauges_top_coords, rgb_index, color):
         # 赤ゲージ２
         dst_x, dst_y = top_coords2[rgb_index]
 
-        draw.line((src_x, src_y, dst_x, dst_y), fill=color, width=2)
+        draw.line((src_x, src_y, dst_x, dst_y), fill=color, width=1)
     pass
 
 
@@ -175,14 +187,14 @@ def center_coords_on_ring(left, top, range, theta_list):
     return coolds
 
 
-def paint_gauge_ring(gauge_center_coords, color_list):
+def draw_gauge_ring(draw, gauge_center_coords, color_list):
     """ 環状 ゲージ 描画
     """
     size = len(gauge_center_coords)
     for i in range(0, size):
         p = gauge_center_coords[i]
         color = color_list[i]
-        paint_gauge(p[0], p[1], color[0], color[1], color[2])
+        draw_gauge(draw, p[0], p[1], color[0], color[1], color[2])
 
 
 def coord_on_gauge(p, value):
@@ -193,7 +205,7 @@ def coord_on_gauge(p, value):
     return p[0], p[1]+11-2*half_byte
 
 
-def paint_gauge(src_center_x, src_center_y, r, g, b):
+def draw_gauge(draw, src_center_x, src_center_y, r, g, b):
     # 四角を縦に16個並べる
     # 幅0、高さ0 で、 1x1 の矩形になる。ブラシの太さ1が関係する？
     w = 10
@@ -215,13 +227,13 @@ def paint_gauge(src_center_x, src_center_y, r, g, b):
     #                gauge_h+src_y), outline=black)
 
     # 赤ゲージ
-    paint_one_color_gauge(src_x, src_y, w, h, r, red)
+    draw_one_color_gauge(draw, src_x, src_y, w, h, r, red)
 
     # 青ゲージ
-    paint_one_color_gauge(src_x+w+2, src_y, w, h, g, green)
+    draw_one_color_gauge(draw, src_x+w+2, src_y, w, h, g, green)
 
     # 緑ゲージ
-    paint_one_color_gauge(src_x+2*(w+2), src_y, w, h, b, blue)
+    draw_one_color_gauge(draw, src_x+2*(w+2), src_y, w, h, b, blue)
 
     y = gauge_h+src_y-font_height
     x = src_x
@@ -232,7 +244,7 @@ def paint_gauge(src_center_x, src_center_y, r, g, b):
     draw.text((x, y), f"{b:02x}", blue)
 
 
-def paint_one_color_gauge(src_left, src_top, w, h, value, fill_color):
+def draw_one_color_gauge(draw, src_left, src_top, w, h, value, fill_color):
     """一色ゲージ
     Parameters
     ----------
@@ -256,13 +268,6 @@ def paint_one_color_gauge(src_left, src_top, w, h, value, fill_color):
         # 2px は開けないと、くっついている。 +1 だと隣なので
         y += h+2
     pass
-
-
-def range1_to_byte(range1):
-    """-1～1 を 0～255 にマッピングします
-    """
-
-    return int((range1+1)*(255/2))
 
 
 def byte_to_half_byte(value):
