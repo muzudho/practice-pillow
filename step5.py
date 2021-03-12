@@ -20,21 +20,22 @@ def main():
     # 0時を赤
     color_list = [(0xff, 0x66, 0x99), (0xff, 0x77, 0x77),
                   (0xff, 0x99, 0x66), (0xff, 0xaa, 0x55),
-                  (0xff, 0xcc, 0x33), (0xff, 0xdd, 0x77),
-                  (0xbb, 0x99, 0x33), (0x22, 0xff, 0x44),
+                  (0xff, 0xcc, 0x33), (0xff, 0xdd, 0x33),
+                  (0xbb, 0xee, 0x33), (0xaa, 0xff, 0x44),
                   (0x99, 0xff, 0x66), (0x88, 0xff, 0x88),
                   (0x66, 0xff, 0x99), (0x33, 0xff, 0xbb),
-                  (0x33, 0x99, 0xcc), (0x33, 0xdd, 0xdd),
+                  (0x33, 0xee, 0xcc), (0x33, 0xdd, 0xdd),
                   (0x33, 0xcc, 0xff), (0x55, 0xaa, 0xff),
                   (0x66, 0x99, 0xff), (0x66, 0x66, 0xff),
                   (0x99, 0x66, 0xff), (0xbb, 0x44, 0xff),
                   (0xcc, 0x33, 0xff), (0xee, 0x33, 0xff),
-                  (0xff, 0x33, 0x22), (0xff, 0x44, 0x66)]
+                  (0xff, 0x33, 0xcc), (0xff, 0x44, 0xbb)]
 
+    # 環状 ゲージ 描画
     gauge_center_coords = center_coords_on_ring(225, 225, 190, theta_list)
+    paint_gauge_ring(gauge_center_coords, color_list)
 
-    paint_gauge_ring(gauge_center_coords)
-
+    # 環状 色セル 描画
     color_cell_center_coords = center_coords_on_ring(225, 225, 120, theta_list)
     size = len(color_cell_center_coords)
     for i in range(0, size):
@@ -46,6 +47,7 @@ def main():
         draw.ellipse((x-circle_w/2, y-circle_w/2, x +
                       circle_w, y+circle_w), fill=fill_color)
 
+    # ゲージ座標
     size = len(gauge_center_coords)
     for i in range(0, size):
         p = gauge_center_coords[i]
@@ -77,14 +79,20 @@ def center_coords_on_ring(left, top, range, theta_list):
     coolds = []
     for theta in theta_list:
         x = range*math.cos(math.radians(theta))+left
-        y = range*math.sin(math.radians(theta))+top
+        # yは上下反転
+        y = -range*math.sin(math.radians(theta))+top
         coolds.append((x, y))
     return coolds
 
 
-def paint_gauge_ring(gauge_center_coords):
-    for p in gauge_center_coords:
-        paint_gauge(p[0], p[1], 0x00, 0x99, 0xff)
+def paint_gauge_ring(gauge_center_coords, color_list):
+    """ 環状 ゲージ 描画
+    """
+    size = len(gauge_center_coords)
+    for i in range(0, size):
+        p = gauge_center_coords[i]
+        color = color_list[i]
+        paint_gauge(p[0], p[1], color[0], color[1], color[2])
 
 
 def coord_on_gauge(p):
