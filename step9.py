@@ -31,6 +31,10 @@ def main():
                   (0xcc, 0x33, 0xff), (0xee, 0x33, 0xff),
                   (0xff, 0x33, 0xcc), (0xff, 0x44, 0xbb)]
 
+    draw_image(theta_list, color_list, 'shared/pillow_imagedraw.png')
+
+
+def draw_image(theta_list, color_list, file_name):
     # 環状 ゲージ 描画
     gauge_center_coords = center_coords_on_ring(225, 225, 190, theta_list)
     paint_gauge_ring(gauge_center_coords, color_list)
@@ -111,7 +115,8 @@ def main():
     # 青レーザー
     draw_beams(three_gauges_top_coords, 2, blue)
 
-    im.save('shared/pillow_imagedraw.png', quality=95)
+    # im.save(file_name, quality=95)
+    im.save(file_name)
 
 
 def draw_beams(three_gauges_top_coords, rgb_index, color):
