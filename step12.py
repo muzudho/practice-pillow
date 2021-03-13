@@ -8,6 +8,22 @@ blue = (0x33, 0x66, 0xff)
 light_gray = (0xee, 0xee, 0xee)
 white = (255, 255, 255)
 
+"""
+# Example: 0時を赤
+color_list = [(0xff, 0x66, 0x99), (0xff, 0x77, 0x77),
+                (0xff, 0x99, 0x66), (0xff, 0xaa, 0x55),
+                (0xff, 0xcc, 0x33), (0xff, 0xdd, 0x33),
+                (0xbb, 0xee, 0x33), (0xaa, 0xff, 0x44),
+                (0x99, 0xff, 0x66), (0x88, 0xff, 0x88),
+                (0x66, 0xff, 0x99), (0x33, 0xff, 0xbb),
+                (0x33, 0xee, 0xcc), (0x33, 0xdd, 0xdd),
+                (0x33, 0xcc, 0xff), (0x55, 0xaa, 0xff),
+                (0x66, 0x99, 0xff), (0x66, 0x66, 0xff),
+                (0x99, 0x66, 0xff), (0xbb, 0x44, 0xff),
+                (0xcc, 0x33, 0xff), (0xee, 0x33, 0xff),
+                (0xff, 0x33, 0xcc), (0xff, 0x44, 0xbb)]
+"""
+
 
 def main():
 
@@ -19,91 +35,102 @@ def main():
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
     color_list = create_cos_wave(size)
-    color_list = filtering_color_list(color_list, bright_fileter)
+    color_list = bright_fileter(color_list)
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/bright-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
     color_list = create_cos_wave(size)
-    color_list = filtering_color_list(color_list, deep_filter)
+    color_list = deep_filter(color_list)
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/deep-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
     color_list = create_cos_wave(size)
-    color_list = filtering_color_list(color_list, dark_filter)
+    color_list = dark_filter(color_list)
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/dark-tone.png')
 
 
-def bright_fileter(color):
-    def element(num):
-        """-1～1 を 0～255 辺りにマッピングします"""
-        return (num+1)*(255/2)
-
-    return int_filter((element(color[0]), element(color[1]), element(color[2])))
-
-
-def deep_filter(color):
-    def element(num):
-        """-1～1 を 0～255 辺りにマッピングします"""
-        return (num+1)*(255/2)
-
-    return int_filter(fit_filter((element(color[0]), element(color[1]), element(color[2])), 300))
-
-
-def dark_filter(color):
-    def element(num):
-        """-1～1 を 0～255 辺りにマッピングします"""
-        return (num+1)*(255/2)
-
-    return int_filter(fit_filter((element(color[0]), element(color[1]), element(color[2])), 200))
-
-
-def fit_filter(color, sum):
-    """R+G+B=sumのsumを指定"""
-
-    sum2 = color[0] + color[1] + color[2]
-    rate = sum / sum2
-    new_color = (color[0]*rate, color[1]*rate, color[2]*rate)
-    print(
-        f"r={color[0]} g={color[1]} b={color[2]} sum={sum} sum2={sum2} rate={rate} r={new_color[0]} g={new_color[1]} b={new_color[2]}")
-    return new_color
-
-
-def int_filter(color):
-    return(int(color[0]), int(color[1]), int(color[2]))
-
-
-def filtering_color_list(old_color_list, color_filter):
-    """
-    # Example: 0時を赤
-    color_list = [(0xff, 0x66, 0x99), (0xff, 0x77, 0x77),
-                  (0xff, 0x99, 0x66), (0xff, 0xaa, 0x55),
-                  (0xff, 0xcc, 0x33), (0xff, 0xdd, 0x33),
-                  (0xbb, 0xee, 0x33), (0xaa, 0xff, 0x44),
-                  (0x99, 0xff, 0x66), (0x88, 0xff, 0x88),
-                  (0x66, 0xff, 0x99), (0x33, 0xff, 0xbb),
-                  (0x33, 0xee, 0xcc), (0x33, 0xdd, 0xdd),
-                  (0x33, 0xcc, 0xff), (0x55, 0xaa, 0xff),
-                  (0x66, 0x99, 0xff), (0x66, 0x66, 0xff),
-                  (0x99, 0x66, 0xff), (0xbb, 0x44, 0xff),
-                  (0xcc, 0x33, 0xff), (0xee, 0x33, 0xff),
-                  (0xff, 0x33, 0xcc), (0xff, 0x44, 0xbb)]
-    """
-
-    color_list = []
+def bright_fileter(color_list):
 
     # ３本の波にフィルターを掛けます
-    size = len(old_color_list)
-    for i in range(0, size):
-        new_color = color_filter(old_color_list[i])
-        # print(f"[{i}] {new_color[0]:02x} {new_color[1]:02x} {new_color[2]:02x}")
-        color_list.append(new_color)
+    return unnormalize_filter(normalize_filter(color_list))
+    # print(f"[{i}] {new_color[0]:02x} {new_color[1]:02x} {new_color[2]:02x}")
 
-    return color_list
+
+def deep_filter(color_list):
+    return unnormalize_filter(normalize_filter(color_list))
+
+
+def dark_filter(color_list):
+    return unnormalize_filter(normalize_filter(color_list))
+
+
+def fit_filter(color_list, sum):
+    """R+G+B=sumのsumを指定"""
+
+    new_color_list = []
+
+    size = len(color_list)
+    for i in range(0, size):
+        sum2 = color_list[i][0] + color_list[i][1] + color_list[i][2]
+        rate = sum / sum2
+        new_color = (color_list[i][0]*rate, color_list[i]
+                     [1]*rate, color_list[i][2]*rate)
+        print(
+            f"r={color_list[i][0]} g={color_list[i][1]} b={color_list[i][2]} sum={sum} sum2={sum2} rate={rate} r={new_color[0]} g={new_color[1]} b={new_color[2]}")
+        new_color_list.append(new_color)
+
+    return new_color_list
+
+
+def int_filter(color_list):
+
+    new_color_list = []
+
+    size = len(color_list)
+    for i in range(0, size):
+        new_color = (int(color_list[i][0]), int(
+            color_list[i][1]), int(color_list[i][2]))
+        new_color_list.append(new_color)
+
+    return new_color_list
+
+
+def normalize_filter(color_list):
+    def element(num):
+        """-1.0～1.0 を 0.0～1.0 にマッピングします"""
+        return (num+1)/2
+
+    new_color_list = []
+
+    size = len(color_list)
+    for i in range(0, size):
+        new_color = (element(color_list[i][0]),
+                     element(color_list[i][1]),
+                     element(color_list[i][2]))
+        new_color_list.append(new_color)
+
+    return new_color_list
+
+
+def unnormalize_filter(color_list):
+    def element(num):
+        """0.0～1.0 を 0～255 にマッピングします"""
+        return int(num*255)
+
+    new_color_list = []
+
+    size = len(color_list)
+    for i in range(0, size):
+        new_color = (element(color_list[i][0]), element(
+            color_list[i][1]), element(color_list[i][2]))
+        new_color_list.append(new_color)
+
+    return new_color_list
 
 
 def create_cos_wave(size):
