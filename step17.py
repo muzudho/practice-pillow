@@ -37,51 +37,60 @@ def main():
     # Vivid
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = unnormalize_filter(exaggeration_filter(
-        tone_filter(create_cos_wave(size), 1, 0), 0.5, 2/3))
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), 1/2, 2/3, 1, 0))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/vivid-tone.png')
 
     # Bright
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = unnormalize_filter(exaggeration_filter(
-        tone_filter(create_cos_wave(size), 1, 0), 1/5, 3/8))
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), 1/5, 3/8, 1, 0))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/bright-tone.png')
 
     # Strong
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = unnormalize_filter(exaggeration_filter(
-        tone_filter(create_cos_wave(size), 1, 0), 1/2, 1/4))
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), 1/2, 1/4, 1, 0))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/strong-tone.png')
 
+    # Deep
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = unnormalize_filter(
-        tone_filter(create_cos_wave(size), 0.2, 0.8))
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), 1/2, 1/3, 0.8, 0.0))
+    draw_tone_circle(draw, theta_list, color_list)
+    im.save('shared/deep-tone.png')
+
+    # Pare
+    im = Image.new('RGB', (450, 450), white)
+    draw = ImageDraw.Draw(im)
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), 0.5, 0, 0.2, 0.8))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/pale-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = unnormalize_filter(
-        tone_filter(create_cos_wave(size), 0.5, 0.5))
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), 0.5, 0, 0.5, 0.5))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/light-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = unnormalize_filter(
-        tone_filter(create_cos_wave(size), 0.6, 0.0))
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), 0.5, 0, 0.6, 0.0))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/dark-tone.png')
 
 
-def tone_filter(color_list, multiple, offset):
-    return add_filter(multiple_filter(normalize_filter(color_list), multiple), offset)
+def tone_filter(color_list, center, rate, multiple, offset):
+    return add_filter(multiple_filter(exaggeration_filter(normalize_filter(color_list), center, rate), multiple), offset)
 
 
 def reverse2_filter(color_list):
