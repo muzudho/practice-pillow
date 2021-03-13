@@ -35,7 +35,7 @@ def main():
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
     # 正順
-    color_list = bright_fileter(create_cos_wave(size))
+    color_list = tone_filter(create_cos_wave(size), 1, 0)
     draw_tone_circle(draw, theta_list, color_list)
     # リバース
     #color_list = reverse2_filter(create_cos_wave(size))
@@ -57,36 +57,23 @@ def main():
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = pale_fileter(create_cos_wave(size))
+    color_list = tone_filter(create_cos_wave(size), 0.2, 0.8)
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/pale-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = dark_fileter(create_cos_wave(size))
+    color_list = tone_filter(create_cos_wave(size), 0.6, 0.2)
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/dark-tone.png')
 
 
-def bright_fileter(color_list):
-
-    # ３本の波にフィルターを掛けます
-    return unnormalize_filter(normalize_filter(color_list))
-    # print(f"[{i}] {new_color[0]:02x} {new_color[1]:02x} {new_color[2]:02x}")
-
-
-def dark_fileter(color_list):
-    rate = 0.6
-    return unnormalize_filter(add_filter(multiple_filter(normalize_filter(color_list), rate), 1-rate-0.4))
+def tone_filter(color_list, multiple, offset):
+    return unnormalize_filter(add_filter(multiple_filter(normalize_filter(color_list), multiple), offset))
 
 
 def light_fileter(color_list):
     rate = 0.4
-    return unnormalize_filter(add_filter(multiple_filter(normalize_filter(color_list), rate), 1-rate))
-
-
-def pale_fileter(color_list):
-    rate = 0.2
     return unnormalize_filter(add_filter(multiple_filter(normalize_filter(color_list), rate), 1-rate))
 
 
