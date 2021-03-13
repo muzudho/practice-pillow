@@ -34,15 +34,13 @@ def main():
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
+    # 正順
     color_list = bright_fileter(create_cos_wave(size))
     draw_tone_circle(draw, theta_list, color_list)
+    # リバース
+    color_list = reverse2_filter(create_cos_wave(size))
+    draw_cell_circle(draw, 225, 225, 80, theta_list, color_list)
     im.save('shared/bright-tone.png')
-
-    im = Image.new('RGB', (450, 450), white)
-    draw = ImageDraw.Draw(im)
-    color_list = deep_filter(create_cos_wave(size))
-    draw_tone_circle(draw, theta_list, color_list)
-    im.save('shared/deep-tone.png')
 
 
 def bright_fileter(color_list):
@@ -52,7 +50,7 @@ def bright_fileter(color_list):
     # print(f"[{i}] {new_color[0]:02x} {new_color[1]:02x} {new_color[2]:02x}")
 
 
-def deep_filter(color_list):
+def reverse2_filter(color_list):
     return unnormalize_filter(reverse_filter(normalize_filter(color_list)))
 
 
@@ -157,7 +155,6 @@ def draw_tone_circle(draw, theta_list, color_list):
 
     # 環状 色セル 描画
     draw_cell_circle(draw, 225, 225, 120, theta_list, color_list)
-    draw_cell_circle(draw, 225, 225, 80, theta_list, color_list)
 
     # ３本ゲージ各天辺座標計算
     three_gauges_top_coords = []
