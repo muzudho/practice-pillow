@@ -61,12 +61,23 @@ def main():
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/pale-tone.png')
 
+    im = Image.new('RGB', (450, 450), white)
+    draw = ImageDraw.Draw(im)
+    color_list = dark_fileter(create_cos_wave(size))
+    draw_tone_circle(draw, theta_list, color_list)
+    im.save('shared/dark-tone.png')
+
 
 def bright_fileter(color_list):
 
     # ３本の波にフィルターを掛けます
     return unnormalize_filter(normalize_filter(color_list))
     # print(f"[{i}] {new_color[0]:02x} {new_color[1]:02x} {new_color[2]:02x}")
+
+
+def dark_fileter(color_list):
+    rate = 0.6
+    return unnormalize_filter(add_filter(multiple_filter(normalize_filter(color_list), rate), 1-rate-0.4))
 
 
 def light_fileter(color_list):
