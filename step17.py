@@ -34,37 +34,37 @@ def main():
                   180, 165, 150, 135, 120, 105]
     size = len(theta_list)
 
+    # Strong (Cos curve)
+    im = Image.new('RGB', (450, 450), white)
+    draw = ImageDraw.Draw(im)
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), middle=1/2, exaggeration=0, multiple=1, offset=0))
+    draw_tone_circle(draw, theta_list, color_list)
+    im.save('shared/strong-tone(cos-curve).png')
+
     # Vivid
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
     color_list = unnormalize_filter(tone_filter(
-        create_cos_wave(size), 1/2, 2/3, 1, 0))
+        create_cos_wave(size), middle=1/2, exaggeration=2/3, multiple=1, offset=0))
     draw_tone_circle(draw, theta_list, color_list)
-    im.save('shared/vivid-tone.png')
+    im.save('shared/vivid-tone(cos-curve-exagger2of3).png')
 
-    # Bright
+    # Deep (Cos curve 4/5)
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
     color_list = unnormalize_filter(tone_filter(
-        create_cos_wave(size), 1/5, 3/8, 1, 0))
+        create_cos_wave(size), middle=1/2, exaggeration=0, multiple=4/5, offset=0))
     draw_tone_circle(draw, theta_list, color_list)
-    im.save('shared/bright-tone.png')
+    im.save('shared/deep-tone(cos-curve-4of5).png')
 
-    # Strong
+    # Bright (Cos curve 4/5 + 1/5)
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
     color_list = unnormalize_filter(tone_filter(
-        create_cos_wave(size), 1/2, 1/4, 1, 0))
+        create_cos_wave(size), middle=1/2, exaggeration=0, multiple=4/5, offset=1/5))
     draw_tone_circle(draw, theta_list, color_list)
-    im.save('shared/strong-tone.png')
-
-    # Deep
-    im = Image.new('RGB', (450, 450), white)
-    draw = ImageDraw.Draw(im)
-    color_list = unnormalize_filter(tone_filter(
-        create_cos_wave(size), 1/2, 1/3, 0.8, 0.0))
-    draw_tone_circle(draw, theta_list, color_list)
-    im.save('shared/deep-tone.png')
+    im.save('shared/bright-tone(cos-curve-4of5-add-1of5).png')
 
     # Pare
     im = Image.new('RGB', (450, 450), white)
@@ -89,19 +89,31 @@ def main():
     im.save('shared/dark-tone.png')
 
 
-def tone_filter(color_list, center, rate, multiple, offset):
-    return add_filter(multiple_filter(exaggeration_filter(normalize_filter(color_list), center, rate), multiple), offset)
+def tone_filter(color_list, middle, exaggeration, multiple, offset):
+    """
+    Parameters
+    ----------
+    middle : flost
+        中間値
+    exaggeration : float
+        誇張の強さ
+    multiple : float
+        ズーム
+    offset : float
+        下駄の高さ
+    """
+    return add_filter(multiple_filter(exaggeration_filter(normalize_filter(color_list), middle, exaggeration), multiple), offset)
 
 
 def reverse2_filter(color_list):
     return reverse_filter(normalize_filter(color_list))
 
 
-def exaggeration_filter(color_list, center, rate):
+def exaggeration_filter(color_list, middle, rate):
     """誇張フィルター。真ん中(0.5)と、端っこ(0,1)は そのまま。その中間は、端に寄る
     """
     def element(num):
-        if center < num:
+        if middle < num:
             return num + (1-num)*rate
         else:
             return num - num*rate
@@ -205,19 +217,19 @@ def normalize_filter(color_list):
 def unnormalize_filter(color_list):
     def element(num):
         """0.0～1.0 を 0～255 にマッピングします。0未満、255より大きいものは切ります"""
-        a = int(num*255)
-        if 255 < a:
-            a = 255
-        elif a < 0:
-            a = 0
-        return a
+        if 1 < num:
+            num = 1
+        elif num < 0:
+            num = 0
+        return int(num*255)
 
     new_color_list = []
 
     size = len(color_list)
     for i in range(0, size):
-        new_color = (element(color_list[i][0]), element(
-            color_list[i][1]), element(color_list[i][2]))
+        new_color = (element(color_list[i][0]),
+                     element(color_list[i][1]),
+                     element(color_list[i][2]))
         new_color_list.append(new_color)
 
     return new_color_list
