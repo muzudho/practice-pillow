@@ -36,39 +36,64 @@ def main():
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    # 正順
-    color_list = tone_filter(create_cos_wave(size), 1, 0)
+    color_list = unnormalize_filter(exaggeration_filter(
+        tone_filter(create_cos_wave(size), 1, 0)))
     draw_tone_circle(draw, theta_list, color_list)
-    # リバース
-    # color_list = reverse2_filter(create_cos_wave(size))
-    # draw_cell_circle(draw, 225, 225, 80, theta_list, color_list)
+    im.save('shared/vivid-tone.png')
+
+    im = Image.new('RGB', (450, 450), white)
+    draw = ImageDraw.Draw(im)
+    color_list = unnormalize_filter(tone_filter(create_cos_wave(size), 1, 0))
+    draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/bright-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = tone_filter(create_cos_wave(size), 0.2, 0.8)
+    color_list = unnormalize_filter(
+        tone_filter(create_cos_wave(size), 0.2, 0.8))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/pale-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = tone_filter(create_cos_wave(size), 0.4, 0.6)
+    color_list = unnormalize_filter(
+        tone_filter(create_cos_wave(size), 0.5, 0.5))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/light-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = tone_filter(create_cos_wave(size), 0.6, 0.0)
+    color_list = unnormalize_filter(
+        tone_filter(create_cos_wave(size), 0.6, 0.0))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/dark-tone.png')
 
 
 def tone_filter(color_list, multiple, offset):
-    return unnormalize_filter(add_filter(multiple_filter(normalize_filter(color_list), multiple), offset))
+    return add_filter(multiple_filter(normalize_filter(color_list), multiple), offset)
 
 
 def reverse2_filter(color_list):
-    return unnormalize_filter(reverse_filter(normalize_filter(color_list)))
+    return reverse_filter(normalize_filter(color_list))
+
+
+def exaggeration_filter(color_list):
+    """誇張フィルター。真ん中(0.5)と、端っこ(0,1)は そのまま。その中間は、端に寄る
+    """
+    def element(num):
+        if 0.5 < num:
+            return num + (1-num)*2/3
+        else:
+            return num - num*2/3
+
+    new_color_list = []
+
+    size = len(color_list)
+    for i in range(0, size):
+        new_color_list.append(
+            (element(color_list[i][0]), element(color_list[i][1]), element(color_list[i][2])))
+
+    return new_color_list
 
 
 def fit_filter(color_list, sum):
