@@ -28,20 +28,10 @@ color_list = [(0xff, 0x66, 0x99), (0xff, 0x77, 0x77),
 def main():
 
     # 0時の方向から時計回り。正円。
-    # theta_list = [90, 75, 60, 45, 30, 15,
-    #              0, 345, 330, 315, 300, 285,
-    #              270, 255, 240, 225, 210, 195,
-    #              180, 165, 150, 135, 120, 105]
-    # 0時の方向から時計回り。正円。平べったくする。
-    d1 = 1
-    d2 = 2
-    d3 = 3
-    d4 = 5
-    d5 = 8
-    theta_list = [90, 75-d1, 60-d2, 45-d3, 30-d4, 15-d5,
-                  0, 345+d5, 330+d4, 315+d3, 300+d2, 285+d1,
-                  270, 255-d1, 240-d2, 225-d3, 210-d4, 195-d5,
-                  180, 165+d5, 150+d4, 135+d3, 120+d2, 105+d1]
+    theta_list = [90, 75, 60, 45, 30, 15,
+                  0, 345, 330, 315, 300, 285,
+                  270, 255, 240, 225, 210, 195,
+                  180, 165, 150, 135, 120, 105]
     size = len(theta_list)
 
     im = Image.new('RGB', (450, 450), white)
@@ -50,8 +40,8 @@ def main():
     color_list = tone_filter(create_cos_wave(size), 1, 0)
     draw_tone_circle(draw, theta_list, color_list)
     # リバース
-    #color_list = reverse2_filter(create_cos_wave(size))
-    #draw_cell_circle(draw, 225, 225, 80, theta_list, color_list)
+    # color_list = reverse2_filter(create_cos_wave(size))
+    # draw_cell_circle(draw, 225, 225, 80, theta_list, color_list)
     im.save('shared/bright-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
@@ -200,13 +190,13 @@ def create_cos_wave(size):
     for i in range(0, size):
         theta = i * arc
         # thetaが0のときyが1なのはcos波
-        # 赤を時計の０時方向に合わせたいので目視で 30° 時計回りに進めるという調整
-        red_modify = -30
+        # 赤を時計の０時方向に合わせたいので目視で 15° 時計回りに進めるという調整
+        red_modify = -15
         ry = math.cos(math.radians(theta+red_modify))
         # print(f"[{i}] red y={ry} theta={theta}")
 
         # 明るさを調整
-        gy = math.cos(math.radians(theta+red_modify-60))
+        gy = math.cos(math.radians(theta+red_modify-120))
 
         by = math.cos(math.radians(theta+red_modify+120))
         print(f"[{i}] {ry} {gy} {by}")
