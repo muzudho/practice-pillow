@@ -34,16 +34,19 @@ def main():
                   180, 165, 150, 135, 120, 105]
     size = len(theta_list)
 
+    # Vivid
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
     color_list = unnormalize_filter(exaggeration_filter(
-        tone_filter(create_cos_wave(size), 1, 0)))
+        tone_filter(create_cos_wave(size), 1, 0), 0.5, 2/3))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/vivid-tone.png')
 
+    # Bright
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = unnormalize_filter(tone_filter(create_cos_wave(size), 1, 0))
+    color_list = unnormalize_filter(exaggeration_filter(
+        tone_filter(create_cos_wave(size), 1, 0), 1/5, 3/8))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/bright-tone.png')
 
@@ -77,14 +80,14 @@ def reverse2_filter(color_list):
     return reverse_filter(normalize_filter(color_list))
 
 
-def exaggeration_filter(color_list):
+def exaggeration_filter(color_list, center, rate):
     """誇張フィルター。真ん中(0.5)と、端っこ(0,1)は そのまま。その中間は、端に寄る
     """
     def element(num):
-        if 0.5 < num:
-            return num + (1-num)*2/3
+        if center < num:
+            return num + (1-num)*rate
         else:
-            return num - num*2/3
+            return num - num*rate
 
     new_color_list = []
 
