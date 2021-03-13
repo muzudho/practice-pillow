@@ -138,16 +138,8 @@ def draw_tone_circle(draw, theta_list, color_list):
     draw_gauge_ring(draw, gauge_center_coords, color_list)
 
     # 環状 色セル 描画
-    color_cell_center_coords = center_coords_on_ring(225, 225, 120, theta_list)
-    size = len(color_cell_center_coords)
-    for i in range(0, size):
-        x, y = color_cell_center_coords[i]
-
-        circle_w = 16
-
-        fill_color = color_list[i]
-        draw.ellipse((x-circle_w/2, y-circle_w/2, x +
-                      circle_w, y+circle_w), fill=fill_color)
+    draw_cell_circle(draw, 225, 225, 120, theta_list, color_list)
+    draw_cell_circle(draw, 225, 225, 80, theta_list, color_list)
 
     # ３本ゲージ各天辺座標計算
     three_gauges_top_coords = []
@@ -214,6 +206,37 @@ def draw_tone_circle(draw, theta_list, color_list):
     draw_beams(draw, three_gauges_top_coords, 2, blue)
 
 
+def draw_cell_circle(draw, left, top, range_n, theta_list, color_list):
+    """
+    Parameters
+    ----------
+    draw :
+
+    left : int
+        中心x
+    top : int
+        中心y
+    range : int
+        半径の長さ
+    theta_list : int[]
+        テータのリスト
+    color_list :
+    """
+
+    color_cell_center_coords = center_coords_on_ring(
+        left, top, range_n, theta_list)
+    size = len(color_cell_center_coords)
+    for i in range(0, size):
+        x, y = color_cell_center_coords[i]
+
+        circle_w = 16
+
+        fill_color = color_list[i]
+        draw.ellipse((x-circle_w/2, y-circle_w/2, x +
+                      circle_w, y+circle_w), fill=fill_color)
+    pass
+
+
 def draw_beams(draw, three_gauges_top_coords, rgb_index, color):
     half_size = int(len(three_gauges_top_coords)/2)
     for i in range(0, half_size):
@@ -229,6 +252,18 @@ def draw_beams(draw, three_gauges_top_coords, rgb_index, color):
 
 
 def center_coords_on_ring(left, top, range, theta_list):
+    """
+    Parameters
+    ----------
+    left : int
+        中心x
+    top : int
+        中心y
+    range : int
+        半径の長さ
+    theta_list int[]
+        テータのリスト
+    """
     coolds = []
     for theta in theta_list:
         x = range*math.cos(math.radians(theta))+left
