@@ -34,24 +34,15 @@ def main():
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = create_cos_wave(size)
-    color_list = bright_fileter(color_list)
+    color_list = bright_fileter(create_cos_wave(size))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/bright-tone.png')
 
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
-    color_list = create_cos_wave(size)
-    color_list = deep_filter(color_list)
+    color_list = deep_filter(create_cos_wave(size))
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/deep-tone.png')
-
-    im = Image.new('RGB', (450, 450), white)
-    draw = ImageDraw.Draw(im)
-    color_list = create_cos_wave(size)
-    color_list = dark_filter(color_list)
-    draw_tone_circle(draw, theta_list, color_list)
-    im.save('shared/dark-tone.png')
 
 
 def bright_fileter(color_list):
@@ -62,11 +53,7 @@ def bright_fileter(color_list):
 
 
 def deep_filter(color_list):
-    return unnormalize_filter(normalize_filter(color_list))
-
-
-def dark_filter(color_list):
-    return unnormalize_filter(normalize_filter(color_list))
+    return unnormalize_filter(reverse_filter(normalize_filter(color_list)))
 
 
 def fit_filter(color_list, sum):
@@ -87,14 +74,18 @@ def fit_filter(color_list, sum):
     return new_color_list
 
 
-def int_filter(color_list):
+def reverse_filter(color_list):
+    def element(num):
+        """1.0-x にマッピングします"""
+        return 1-num
 
     new_color_list = []
 
     size = len(color_list)
     for i in range(0, size):
-        new_color = (int(color_list[i][0]), int(
-            color_list[i][1]), int(color_list[i][2]))
+        new_color = (element(color_list[i][0]),
+                     element(color_list[i][1]),
+                     element(color_list[i][2]))
         new_color_list.append(new_color)
 
     return new_color_list
