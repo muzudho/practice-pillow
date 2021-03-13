@@ -98,13 +98,37 @@ def main():
     draw_tone_circle(draw, theta_list, color_list)
     im.save('shared/dull-tone(cos-curve-2of5+1of5).png')
 
-    # Pare
+    # Dark grayish (Cos curve 2/5 + 0/5)
     im = Image.new('RGB', (450, 450), white)
     draw = ImageDraw.Draw(im)
     color_list = unnormalize_filter(tone_filter(
-        create_cos_wave(size), 0.5, 0, 0.2, 0.8))
+        create_cos_wave(size), middle=1/2, exaggeration=0, multiple=2/5, offset=0/5))
     draw_tone_circle(draw, theta_list, color_list)
-    im.save('shared/pale-tone.png')
+    im.save('shared/dark-grayish-tone(cos-curve-2of5+0of5).png')
+
+    # Grayish (Cos curve 2/5 + 1/5)
+    im = Image.new('RGB', (450, 450), white)
+    draw = ImageDraw.Draw(im)
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), middle=1/2, exaggeration=0, multiple=2/5, offset=1/5))
+    draw_tone_circle(draw, theta_list, color_list)
+    im.save('shared/grayish-tone(cos-curve-2of5+1of5).png')
+
+    # Light grayish (Cos curve 2/5 + 2/5)
+    im = Image.new('RGB', (450, 450), white)
+    draw = ImageDraw.Draw(im)
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), middle=1/2, exaggeration=0, multiple=2/5, offset=2/5))
+    draw_tone_circle(draw, theta_list, color_list)
+    im.save('shared/light-grayish-tone(cos-curve-2of5+2of5).png')
+
+    # Pare (Cos curve 2/5 + 3/5)
+    im = Image.new('RGB', (450, 450), white)
+    draw = ImageDraw.Draw(im)
+    color_list = unnormalize_filter(tone_filter(
+        create_cos_wave(size), middle=1/2, exaggeration=0, multiple=2/5, offset=3/5))
+    draw_tone_circle(draw, theta_list, color_list)
+    im.save('shared/pale-tone(cos-curve-2of5+3of5).png')
 
 
 def tone_filter(color_list, middle, exaggeration, multiple, offset):
