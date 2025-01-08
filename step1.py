@@ -1,3 +1,7 @@
+"""画像を新規作成して保存
+直線上に資格を配置
+"""
+
 from PIL import Image, ImageDraw
 
 black = (0, 0, 0)

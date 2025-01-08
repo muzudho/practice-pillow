@@ -1,3 +1,7 @@
+"""画像を新規作成して保存
+円周上に四角とテキストを配置
+"""
+
 from PIL import Image, ImageDraw
 import math
 
